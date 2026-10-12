@@ -21,6 +21,18 @@ class Api extends REST_Controller {
         // $this->cors->handle();
     }
 
+    // Folder penyimpanan arsip. Diatur lewat $config['arsip_path'] di config.php,
+    // default ke mount OSS production bila tidak diisi. Path relatif dihitung dari FCPATH.
+    private function _arsip_path(){
+        $path = $this->config->item('arsip_path');
+        if(empty($path)){
+            $path = '/mnt/ossfs/arsip/';
+        }elseif($path[0] !== '/'){
+            $path = FCPATH.$path;
+        }
+        return rtrim($path, '/').'/';
+    }
+
     public function index_get(){
         $result = array(
             'status'    => 'S',
@@ -97,7 +109,7 @@ class Api extends REST_Controller {
 
         //get real filename from db
         //production
-        $files = '/mnt/ossfs/arsip/'.$filename;
+        $files = $this->_arsip_path().$filename;
         //lokal
         // $files = FCPATH.'assets/arsip/'.$filename;
         // if($this->env == 'dev'){   
@@ -181,7 +193,7 @@ class Api extends REST_Controller {
                 $upload_limit = $this->m_api->get_upload_limit();
                 $config = array();
                 // $config['upload_path'] = './assets/arsip/';         // Local
-                $config['upload_path'] = '/mnt/ossfs/arsip/';       // Production
+                $config['upload_path'] = $this->_arsip_path();       // config arsip_path (default /mnt/ossfs/arsip/)
                 $config['allowed_types'] = '*';
                 // $config['max_size']      = '20000';
                 $config['max_size']      = $upload_limit;
@@ -370,7 +382,7 @@ class Api extends REST_Controller {
             if(!empty($getFiles)){
                 foreach($getFiles as $key => $value){
                     // $source = FCPATH.'assets/arsip/'.$value->filename;   // Local
-                    $source = '/mnt/ossfs/arsip/'.$value->filename;         // Production
+                    $source = $this->_arsip_path().$value->filename;         // config arsip_path
                     $del_file = unlink($source);
                     if($del_file){
                         $this->m_api->delete_file($value->id);
@@ -389,7 +401,7 @@ class Api extends REST_Controller {
                 $upload_limit = $this->m_api->get_upload_limit();
                 $config = array();
                 // $config['upload_path'] = './assets/arsip/';         // Local
-                $config['upload_path'] = '/mnt/ossfs/arsip/';       // Production
+                $config['upload_path'] = $this->_arsip_path();       // config arsip_path (default /mnt/ossfs/arsip/)
                 $config['allowed_types'] = '*';
                 // $config['max_size']      = '20000';
                 $config['max_size']      = $upload_limit;

@@ -6,3 +6,5 @@ application/config/config.php
 vendor/
 user_guide/
 .env
+analisa/
+assets/arsip/
