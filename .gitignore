@@ -1,0 +1,8 @@
+.DS_Store
+vendor
+.idea
+application/config/database.php
+application/config/config.php
+vendor/
+user_guide/
+.env
